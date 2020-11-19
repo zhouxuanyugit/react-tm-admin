@@ -42,7 +42,7 @@ class TableComponent extends Component {
   };
   fetchData = () => {
     this.setState({ loading: true });
-    tableList(this.state.listQuery).then((response) => {
+    tableList({page: 1, size: 10}).then((response) => {
       this.setState({ loading: false });
       const list = response.data.data.items;
       const total = response.data.data.total;

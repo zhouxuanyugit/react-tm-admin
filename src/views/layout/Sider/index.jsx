@@ -14,7 +14,7 @@ const LayoutSider = (props) => {
       trigger={null}
       style={{ zIndex: "10" }}
     >
-      {sidebarLogo ? <Logo /> : null}
+      <Logo />
       <Menu />
     </Sider>
   );

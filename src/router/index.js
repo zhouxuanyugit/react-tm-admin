@@ -14,15 +14,15 @@ class Router extends React.Component {
           <Route
             path="/"
             render={() => {
-              if (!token) {
-                return <Redirect to="/login" />;
-              } else {
-                if (role) {
+              // if (!token) {
+                // return <Redirect to="/login" />;
+              // } else {
+                // if (role) {
                   return <Layout />;
-                } else {
-                  getUserInfo(token).then(() => <Layout />);
-                }
-              }
+                // } else {
+                  // getUserInfo(token).then(() => <Layout />);
+                // }
+              // }
             }}
           />
         </Switch>

@@ -3,22 +3,23 @@ import { reqLogin, reqLogout } from "@/api/login";
 import { setToken, removeToken } from "@/utils/auth";
 export const login = (username, password) => (dispatch) => {
   return new Promise((resolve, reject) => {
-    reqLogin({ username: username.trim(), password: password })
-      .then((response) => {
-        const { data } = response;
-        if (data.status === 0) {
-          const token = data.token;
-          dispatch(setUserToken(token));
-          setToken(token);
-          resolve(data);
-        } else {
-          const msg = data.message;
-          reject(msg);
-        }
-      })
-      .catch((error) => {
-        reject(error);
-      });
+    dispatch(setUserToken('fwefweafawefasdasdfewf'));
+    // reqLogin({ username: username.trim(), password: password })
+    //   .then((response) => {
+    //     const { data } = response;
+    //     if (data.status === 0) {
+    //       const token = data.token;
+    //       dispatch(setUserToken(token));
+    //       setToken(token);
+    //       resolve(data);
+    //     } else {
+    //       const msg = data.message;
+    //       reject(msg);
+    //     }
+    //   })
+    //   .catch((error) => {
+    //     reject(error);
+    //   });
   });
 };
 

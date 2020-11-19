@@ -3,8 +3,6 @@ import { connect } from "react-redux";
 import { Icon, Menu, Dropdown, Modal, Layout, Avatar } from "antd";
 import { Link } from "react-router-dom";
 import { logout, getUserInfo } from "@/store/actions";
-import FullScreen from "@/components/FullScreen";
-import Settings from "@/components/Settings";
 import Hamburger from "@/components/Hamburger";
 import BreadCrumb from "@/components/BreadCrumb";
 import "./index.less";
@@ -17,13 +15,12 @@ const LayoutHeader = (props) => {
     sidebarCollapsed,
     logout,
     getUserInfo,
-    showSettings,
     fixedHeader,
   } = props;
   token && getUserInfo(token);
   const handleLogout = (token) => {
     Modal.confirm({
-      title: "注销",
+      title: "退出",
       content: "确定要退出系统吗?",
       okText: "确定",
       cancelText: "取消",
@@ -43,20 +40,7 @@ const LayoutHeader = (props) => {
   };
   const menu = (
     <Menu onClick={onClick}>
-      <Menu.Item key="dashboard">
-        <Link to="/dashboard">首页</Link>
-      </Menu.Item>
-      <Menu.Item key="project">
-        <a
-          target="_blank"
-          href="https://github.com/NLRX-WJC/react-antd-admin-template"
-          rel="noopener noreferrer"
-        >
-          项目地址
-        </a>
-      </Menu.Item>
-      <Menu.Divider />
-      <Menu.Item key="logout">注销</Menu.Item>
+      <Menu.Item key="logout">退出</Menu.Item>
     </Menu>
   );
   const computedStyle = () => {
@@ -90,8 +74,6 @@ const LayoutHeader = (props) => {
         <Hamburger />
         <BreadCrumb />
         <div className="right-menu">
-          <FullScreen />
-          {showSettings ? <Settings /> : null}
           <div className="dropdown-wrap">
             <Dropdown overlay={menu}>
               <div>
@@ -110,7 +92,6 @@ const mapStateToProps = (state) => {
   return {
     ...state.app,
     ...state.user,
-    ...state.settings,
   };
 };
 export default connect(mapStateToProps, { logout, getUserInfo })(LayoutHeader);

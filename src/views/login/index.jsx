@@ -15,21 +15,26 @@ const Login = (props) => {
   const handleLogin = (username, password) => {
     // 登录完成后 发送请求 调用接口获取用户信息
     setLoading(true);
-    login(username, password)
-      .then((data) => {
-        message.success("登录成功");
-        handleUserInfo(data.token);
-      })
-      .catch((error) => {
-        setLoading(false);
-        message.error(error);
-      });
+    // login(username, password)
+    //   .then((data) => {
+    //     message.success("登录成功");
+    //     handleUserInfo(data.token);
+    //   })
+    //   .catch((error) => {
+    //     setLoading(false);
+    //     message.error(error);
+    //   });
+
+    message.success("登录成功");
+    props.history.push('/familyManagement/index');
   };
 
   // 获取用户信息
   const handleUserInfo = (token) => {
     getUserInfo(token)
-      .then((data) => {})
+      .then((data) => {
+
+      })
       .catch((error) => {
         message.error(error);
       });
@@ -51,9 +56,9 @@ const Login = (props) => {
     });
   };
 
-  if (token) {
-    return <Redirect to="/dashboard" />;
-  }
+  // if (token) {
+  //   return <Redirect to="/dashboard" />;
+  // }
   return (
     <DocumentTitle title={"用户登录"}>
       <div className="login-container">
@@ -109,13 +114,6 @@ const Login = (props) => {
               >
                 登录
               </Button>
-            </Form.Item>
-            <Form.Item>
-              <span>账号 : admin 密码 : 随便填</span>
-              <br />
-              <span>账号 : editor 密码 : 随便填</span>
-              <br />
-              <span>账号 : guest 密码 : 随便填</span>
             </Form.Item>
           </Spin>
         </Form>

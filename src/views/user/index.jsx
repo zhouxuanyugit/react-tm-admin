@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import { Card, Button, Table, message, Divider } from "antd";
 import { getUsers, deleteUser, editUser, addUser } from "@/api/user";
-import TypingCard from '@/components/TypingCard'
 import EditUserForm from "./forms/edit-user-form"
 import AddUserForm from "./forms/add-user-form"
 const { Column } = Table;
@@ -101,11 +100,8 @@ class User extends Component {
         <Button type='primary' onClick={this.handleAddUser}>添加用户</Button>
       </span>
     )
-    const cardContent = `在这里，你可以对系统中的用户进行管理，例如添加一个新用户，或者修改系统中已经存在的用户。`
     return (
       <div className="app-container">
-        <TypingCard title='用户管理' source={cardContent} />
-        <br/>
         <Card title={title}>
           <Table bordered rowKey="id" dataSource={users} pagination={false}>
             <Column title="用户ID" dataIndex="id" key="id" align="center"/>

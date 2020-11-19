@@ -1,7 +1,7 @@
 import request from '@/utils/request'
 export function tableList(data) {
   return request({
-    url: '/table/list',
+    url: '/illness/getIllnessList',
     method: 'post',
     data
   })
