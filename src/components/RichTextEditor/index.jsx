@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Card, Row, Col, Button } from "antd";
-// import { Editor } from "react-draft-wysiwyg";
 import { Editor } from '@tinymce/tinymce-react';
-import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import "./index.less";
 
 const RichTextEditor = () => {

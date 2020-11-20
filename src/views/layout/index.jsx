@@ -1,10 +1,9 @@
 import React from "react";
-import { connect } from "react-redux";
 import Content from "./Content";
 import Header from "./Header";
 import Sider from "./Sider";
 import { Layout } from "antd";
-const Main = (props) => {
+const Main = () => {
   return (
     <Layout style={{ minHeight: "100vh" }}>
       <Sider />
@@ -15,4 +14,4 @@ const Main = (props) => {
     </Layout>
   );
 };
-export default connect((state) => state.settings)(Main);
+export default Main;

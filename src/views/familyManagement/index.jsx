@@ -9,48 +9,71 @@ import {
   Pagination,
   Divider,
   message,
-  Select
+  Select,
+  DatePicker
 } from "antd";
-import { tableList, deleteItem,editItem } from "@/api/table";
-import EditForm from "./forms/editForm"
+import moment from 'moment';
+import { getTableList, deleteItem, editItem } from "@/api/table";
+import EditForm from "./components/editForm";
+import AddForm from "./components/addForm";
 const { Column } = Table;
 const { Panel } = Collapse;
-class TableComponent extends Component {
+const { RangePicker } = DatePicker;
+
+const mockData = [
+  { id: 1, familyName: '家庭1', familyDes: 'testtest', member: ['周周'], doctor: '111', hushi: '222', zuli: '333', time: 1605785755000 },
+]
+
+class FamilyManagementComponent extends Component {
   _isMounted = false; // 这个变量是用来标志当前组件是否挂载
   state = {
-    list: [],
+    tableList: [],
     loading: false,
     total: 0,
     listQuery: {
       pageNumber: 1,
       pageSize: 10,
-      title: "",
-      star: "",
-      status:""
+      familyName: "",
+      servicePerson: "",
+      dateRange: []
     },
+
     editModalVisible: false,
     editModalLoading: false,
-    currentRowData: {
+    editModalKey: 100,
+    editData: {
       id: 0,
-      author: "",
-      date: "",
-      readings: 0,
-      star: "★",
-      status: "published",
-      title: ""
-    }
+      familyName: '',
+      familyDes: ''
+    },
+
+    addModalVisible: false,
+    addModalLoading: false
   };
   fetchData = () => {
     this.setState({ loading: true });
-    tableList({page: 1, size: 10}).then((response) => {
+    getTableList({ page: 1, size: 10 }).then((response) => {
       this.setState({ loading: false });
-      const list = response.data.data.items;
-      const total = response.data.data.total;
+      const tableList = mockData;
+      const total = 1;
       if (this._isMounted) {
-        this.setState({ list, total });
+        this.setState({ tableList, total });
       }
     });
   };
+  resetData = () => {
+    this.setState({
+      listQuery: {
+        pageNumber: 1,
+        pageSize: 10,
+        familyName: "",
+        servicePerson: "",
+        dateRange: []
+      }
+    })
+
+    this.fetchData();
+  }
   componentDidMount() {
     this._isMounted = true;
     this.fetchData();
@@ -58,28 +81,28 @@ class TableComponent extends Component {
   componentWillUnmount() {
     this._isMounted = false;
   }
-  filterTitleChange = (e) => {
+  filterFamilyNameChange = (e) => {
     let value = e.target.value
     this.setState((state) => ({
       listQuery: {
         ...state.listQuery,
-        title:value,
+        familyName: value,
       }
     }));
   };
-  filterStatusChange = (value) => {
+  filterServicePersonChange = (value) => {
     this.setState((state) => ({
       listQuery: {
         ...state.listQuery,
-        status:value,
+        servicePerson: value,
       }
     }));
   };
-  filterStarChange  = (value) => {
+  filterDateRangeChange = (dates, dateStrings) => {
     this.setState((state) => ({
       listQuery: {
         ...state.listQuery,
-        star:value,
+        dateRange: dates,
       }
     }));
   };
@@ -111,76 +134,93 @@ class TableComponent extends Component {
     );
   };
   handleDelete = (row) => {
-    deleteItem({id:row.id}).then(res => {
+    deleteItem({ id: row.id }).then(res => {
       message.success("删除成功")
       this.fetchData();
     })
   }
+  // edit start
   handleEdit = (row) => {
     this.setState({
-      currentRowData:Object.assign({}, row),
+      editData: Object.assign({}, row),
       editModalVisible: true,
+      editModalKey: `editmodal${this.state.editModalKey + 1}`
     });
   };
 
-  handleOk = _ => {
-    const { form } = this.formRef.props;
-    form.validateFields((err, fieldsValue) => {
-      if (err) {
-        return;
-      }
-      const values = {
-        ...fieldsValue,
-        'star': "".padStart(fieldsValue['star'], '★'),
-        'date': fieldsValue['date'].format('YYYY-MM-DD HH:mm:ss'),
-      };
-      this.setState({ editModalLoading: true, });
-      editItem(values).then((response) => {
-        form.resetFields();
-        this.setState({ editModalVisible: false, editModalLoading: false });
-        message.success("编辑成功!")
-        this.fetchData()
-      }).catch(e => {
-        message.success("编辑失败,请重试!")
-      })
-      
-    });
+  handleEditOk = (values) => {
+    console.log(values);
+    this.setState({ editModalLoading: true, });
+    setTimeout(() => {
+      message.success("编辑成功!")
+      this.setState({ editModalVisible: false, editModalLoading: false });
+      this.fetchData();
+    }, 2000);
   };
 
-  handleCancel = _ => {
-    this.setState({
-      editModalVisible: false,
-    });
+  handleEditCancel = _ => {
+    this.setState({ editModalVisible: false });
   };
+  // edit end
+  // add start
+  handleAdd = () => {
+    this.setState({ addModalVisible: true });
+  }
+
+  handleAddOk = (values) => {
+    console.log(values);
+    this.setState({ addModalLoading: true, });
+    setTimeout(() => {
+      message.success("添加成功!")
+      this.setState({ addModalVisible: false, addModalLoading: false });
+      this.fetchData();
+    }, 2000);
+  }
+
+  handleAddCancel = () => {
+    this.setState({ addModalVisible: false });
+  }
+  //add end
   render() {
     return (
       <div className="app-container">
         <Collapse defaultActiveKey={["1"]}>
-          <Panel header="筛选" key="1">
+          <Panel header="操作" key="1">
             <Form layout="inline">
-              <Form.Item label="标题:">
-                <Input onChange={this.filterTitleChange} />
+              <Form.Item label="家庭名称:">
+                <Input value={this.state.listQuery.familyName} onChange={this.filterFamilyNameChange} />
               </Form.Item>
-              <Form.Item label="类型:">
+              <Form.Item label="服务人员:">
                 <Select
+                  value={this.state.listQuery.servicePerson}
                   style={{ width: 120 }}
-                  onChange={this.filterStatusChange}>
-                  <Select.Option value="published">published</Select.Option>
-                  <Select.Option value="draft">draft</Select.Option>
+                  onChange={this.filterServicePersonChange}>
+                  <Select.Option value="">全部</Select.Option>
+                  <Select.Option value="123">医生</Select.Option>
+                  <Select.Option value="43">护士</Select.Option>
+                  <Select.Option value="dra543ft">助理</Select.Option>
                 </Select>
               </Form.Item>
-              <Form.Item label="推荐指数:">
-                <Select
-                  style={{ width: 120 }}
-                  onChange={this.filterStarChange}>
-                  <Select.Option value={1}>★</Select.Option>
-                  <Select.Option value={2}>★★</Select.Option>
-                  <Select.Option value={3}>★★★</Select.Option>
-                </Select>
+              <Form.Item label="录入时间:">
+                <RangePicker
+                  value={this.state.listQuery.dateRange}
+                  onChange={this.filterDateRangeChange}
+                  allowClear={false}
+                />
               </Form.Item>
               <Form.Item>
-                <Button type="primary" icon="search" onClick={this.fetchData}>
-                  搜索
+                <Button type="primary" onClick={this.fetchData}>
+                  查询
+                </Button>
+              </Form.Item>
+              <Form.Item>
+                <Button type="default" onClick={this.resetData} >
+                  重置
+                </Button>
+              </Form.Item>
+              <Form.Item>
+                <Button type="primary" onClick={this.handleAdd} >
+                  添加
                 </Button>
               </Form.Item>
             </Form>
@@ -190,32 +230,31 @@ class TableComponent extends Component {
         <Table
           bordered
           rowKey={(record) => record.id}
-          dataSource={this.state.list}
+          dataSource={this.state.tableList}
           loading={this.state.loading}
           pagination={false}
         >
-          <Column title="序号" dataIndex="id" key="id" width={200} align="center" sorter={(a, b) => a.id - b.id}/>
-          <Column title="标题" dataIndex="title" key="title" width={200} align="center"/>
-          <Column title="作者" dataIndex="author" key="author" width={100} align="center"/>
-          <Column title="阅读量" dataIndex="readings" key="readings" width={195} align="center"/>
-          <Column title="推荐指数" dataIndex="star" key="star" width={195} align="center"/>
-          <Column title="状态" dataIndex="status" key="status" width={195} align="center" render={(status) => {
-            let color =
-              status === "published" ? "green" : status === "deleted" ? "red" : "";
+          <Column title="序号" dataIndex="id" key="id" width={80} align="center" />
+          <Column title="家庭名称" dataIndex="familyName" key="familyName" align="center" />
+          <Column title="家庭描述" dataIndex="familyDes" key="author" align="center" />
+          <Column title="家庭成员" dataIndex="member" key="status" align="center" render={(status) => {
             return (
-              <Tag color={color} key={status}>
+              <Tag key={status}>
                 {status}
               </Tag>
             );
-          }}/>
-          <Column title="时间" dataIndex="date" key="date" width={195} align="center"/>
-          <Column title="操作" key="action" width={195} align="center"render={(text, row) => (
+          }} />
+          <Column title="服务医生" dataIndex="doctor" key="readings" align="center" />
+          <Column title="服务护士" dataIndex="hushi" key="star" align="center" />
+          <Column title="服务助理" dataIndex="zuli" key="date" align="center" />
+          <Column title="录入时间" dataIndex="time" key="time" align="center" render={item => moment(item).format('YYYY-MM-DD HH:mm:ss')} />
+          <Column title="操作" key="action" align="center" render={(text, row) => (
             <span>
-              <Button type="primary" shape="circle" icon="edit" title="编辑" onClick={this.handleEdit.bind(null,row)}/>
-              <Divider type="vertical" />
-              <Button type="primary" shape="circle" icon="delete" title="删除" onClick={this.handleDelete.bind(null,row)}/>
+              <Button type="link" onClick={this.handleEdit.bind(null, row)}>编辑</Button>
+              <Button type="link" onClick={this.handleDelete.bind(null, row)}>家庭成员</Button>
+              <Button type="link" onClick={this.handleDelete.bind(null, row)}>服务人员设置</Button>
             </span>
-          )}/>
+          )} />
         </Table>
         <br />
         <Pagination
@@ -227,19 +266,24 @@ class TableComponent extends Component {
           onShowSizeChange={this.changePageSize}
           showSizeChanger
           showQuickJumper
-          hideOnSinglePage={true}
         />
-        <EditForm
-          currentRowData={this.state.currentRowData}
-          wrappedComponentRef={formRef => this.formRef = formRef}
-          visible={this.state.editModalVisible}
-          confirmLoading={this.state.editModalLoading}
-          onCancel={this.handleCancel}
-          onOk={this.handleOk}
-        />  
+            <EditForm
+              key={this.state.editModalKey}
+              editData={this.state.editData}
+              visible={this.state.editModalVisible}
+              confirmLoading={this.state.editModalLoading}
+              onCancel={this.handleEditCancel}
+              onOk={this.handleEditOk}
+            /> 
+        <AddForm
+          visible={this.state.addModalVisible}
+          confirmLoading={this.state.addModalLoading}
+          onCancel={this.handleAddCancel}
+          onOk={this.handleAddOk}
+        />
       </div>
     );
   }
 }
 
-export default TableComponent;
+export default FamilyManagementComponent;

@@ -1,5 +1,5 @@
 import request from '@/utils/request'
-export function tableList(data) {
+export function getTableList(data) {
   return request({
     url: '/illness/getIllnessList',
     method: 'post',

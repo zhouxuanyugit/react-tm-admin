@@ -6,11 +6,24 @@ const menuList = [
   {
     title: "家庭管理",
     path: "/familyManagement",
-    icon: "appstore",
     children: [
       {
         title: "家庭列表管理",
         path: "/familyManagement/index",
+      }
+    ],
+  },
+  {
+    title: "任务管理",
+    path: "/taskManagement",
+    children: [
+      {
+        title: "任务类型管理",
+        path: "/taskManagement/type",
+      },
+      {
+        title: "任务列表管理",
+        path: "/taskManagement/list",
       }
     ],
   },

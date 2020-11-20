@@ -1,14 +1,16 @@
 import React, { useState } from "react";
 import { Redirect } from "react-router-dom";
-import { Form, Icon, Input, Button, message, Spin } from "antd";
+import { Form, Input, Button, message, Spin } from "antd";
+import {
+  UserOutlined,
+  LockOutlined
+} from '@ant-design/icons';
 import { connect } from "react-redux";
-import DocumentTitle from "react-document-title";
 import "./index.less";
 import { login, getUserInfo } from "@/store/actions";
 
 const Login = (props) => {
   const { form, token, login, getUserInfo } = props;
-  const { getFieldDecorator } = form;
 
   const [loading, setLoading] = useState(false);
 
@@ -55,75 +57,80 @@ const Login = (props) => {
       }
     });
   };
+  const onFinish = (values) => {
+    console.log('Success:', values);
+    setLoading(true);
+    message.success("登录成功");
+    props.history.push('/familyManagement/index');
+  };
+
+  const onFinishFailed = (errorInfo) => {
+    console.log('Failed:', errorInfo);
+  };
 
   // if (token) {
   //   return <Redirect to="/dashboard" />;
   // }
   return (
-    <DocumentTitle title={"用户登录"}>
-      <div className="login-container">
-        <Form onSubmit={handleSubmit} className="content">
-          <div className="title">
-            <h2>用户登录</h2>
-          </div>
-          <Spin spinning={loading} tip="登录中...">
-            <Form.Item>
-              {getFieldDecorator("username", {
-                rules: [
-                  {
-                    required: true,
-                    whitespace: true,
-                    message: "请输入用户名",
-                  },
-                ],
-                initialValue: "admin", // 初始值
-              })(
-                <Input
-                  prefix={
-                    <Icon type="user" style={{ color: "rgba(0,0,0,.25)" }} />
-                  }
-                  placeholder="用户名"
-                />
-              )}
-            </Form.Item>
-            <Form.Item>
-              {getFieldDecorator("password", {
-                rules: [
-                  {
-                    required: true,
-                    whitespace: true,
-                    message: "请输入密码",
-                  },
-                ],
-                initialValue: "123456", // 初始值
-              })(
-                <Input
-                  prefix={
-                    <Icon type="lock" style={{ color: "rgba(0,0,0,.25)" }} />
-                  }
-                  type="password"
-                  placeholder="密码"
-                />
-              )}
-            </Form.Item>
-            <Form.Item>
-              <Button
-                type="primary"
-                htmlType="submit"
-                className="login-form-button"
-              >
-                登录
-              </Button>
-            </Form.Item>
-          </Spin>
-        </Form>
-      </div>
-    </DocumentTitle>
+    <div className="login-container">
+      <Form
+        className="content"
+        onFinish={onFinish}
+        onFinishFailed={onFinishFailed}
+      >
+        <div className="title">
+          <h2>用户登录</h2>
+        </div>
+        <Spin spinning={loading} tip="登录中...">
+          <Form.Item
+            name="username"
+            rules={[
+              {
+                required: true,
+                whitespace: true,
+                message: '请输入用户名!',
+              },
+            ]}
+          >
+            <Input
+              prefix={
+                <UserOutlined style={{ color: "rgba(0,0,0,.25)" }} />
+              }
+              placeholder="用户名"
+            />
+          </Form.Item>
+          <Form.Item
+            name="password"
+            rules={[
+              {
+                required: true,
+                whitespace: true,
+                message: '请输入密码',
+              },
+            ]}
+          >
+            <Input.Password
+              prefix={
+                <LockOutlined style={{ color: "rgba(0,0,0,.25)" }} />
+              }
+              placeholder="密码"
+            />
+          </Form.Item>
+          <Form.Item>
+            <Button
+              type="primary"
+              htmlType="submit"
+              className="login-form-button"
+            >
+              登录
+            </Button>
+          </Form.Item>
+        </Spin>
+      </Form>
+    </div>
   );
 };
 
-const WrapLogin = Form.create()(Login);
+// const WrapLogin = Form.create()(Login);
 
-export default connect((state) => state.user, { login, getUserInfo })(
-  WrapLogin
-);
+export default connect((state) => state.user, { login, getUserInfo })(Login);
